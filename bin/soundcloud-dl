@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+import soundcloud_dl
+
+
+if __name__ == '__main__':
+    soundcloud_dl.main()

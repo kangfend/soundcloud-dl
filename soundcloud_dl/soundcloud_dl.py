@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-import argparse
 import os
 import re
 import requests
 
 
 class SoundCloud:
-    def __init__(self, url, output='.'):
+    def __init__(self, url, output=None):
         self.url = url
         self.page = requests.get(self.url).content
-        self.output = os.path.abspath(output)
+        self.output = os.path.abspath(output if output else '.')
 
     def get_track_id(self):
         track_id = re.search(r'https://api.soundcloud.com/tracks/(\d+)', self.page)
@@ -47,23 +46,3 @@ class SoundCloud:
         path = os.path.join(self.output, self.get_title())
         with open('{0}.mp3'.format(path), 'wb') as mp3:
             mp3.write(media_file)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Soundcloud downloader')
-    parser.add_argument('link', nargs='?', help='soundcloud link')
-    parser.add_argument('-o', '--output')
-    args = parser.parse_args()
-    if args.link:
-        try:
-            soundcloud = SoundCloud(args.link, output=args.output)
-            print '[+] Trying to download file...'
-            soundcloud.download_mp3()
-            path = os.path.join(soundcloud.output, soundcloud.get_title())
-            print '[+] Download completed, file saved to "{0}.mp3"'.format(path)
-        except requests.exceptions.ConnectionError:
-            print '[-] Download failed, please check your connection!'
-        except KeyboardInterrupt:
-            print '\b\b[!] Download aborted!'
-    else:
-        print parser.print_help()
